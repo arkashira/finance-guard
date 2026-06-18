@@ -1,0 +1,21 @@
+# Business Model Canvas – **finance-guard**
+
+| **Key Partners** | **Key Activities** |
+|------------------|--------------------|
+| **Core Banking & Payments Platforms**  <br>• FIS, Temenos, Stripe, Adyen  <br>• API gateway providers (Kong, Apigee) | **Product Development**  <br>• Build & maintain real‑time transaction ingestion pipelines  <br>• Implement anomaly detection & issue‑resolution workflows  <br>• Integrate with vLLM (inference) and SGLang (structured generation) |
+| **Cloud & Infrastructure**  <br>• AWS (EC2, RDS, Kinesis), GCP (Compute Engine, Pub/Sub)  <br>• Edge CDN providers for low‑latency data capture | **Data Engineering**  <br>• Curate and continuously enrich the internal datasets (auto, messages, instr‑resp, query‑resp)  <br>• Train and fine‑tune domain‑specific LLMs for transaction classification and resolution suggestions |
+| **Compliance & Regulatory Bodies**  <br>• FCA, OCC, MAS  <br>• Third‑party AML/KYC verification services | **Compliance & Security**  <br>• Implement GDPR, PCI‑DSS, and local AML/KYC controls  <br>• Conduct regular security audits and penetration testing |
+| **Professional Services & System Integrators**  <br>• Accenture, Deloitte, boutique fintech consultancies | **Customer Success & Support**  <br>• On‑boarding, integration assistance, 24/7 incident response  <br>• Continuous improvement loop feeding back QA‑validated outcomes into the Axentx knowledge base |
+| **Data & Model Vendors**  <br>• Open‑source model contributors (vLLM, SGLang)  <br>• Licensed financial transaction datasets (where needed) | **Product Validation**  <br>• Run revenue‑validated pilots (QA‑gate) before full release  <br>• Measure reduction in transaction delays & client satisfaction metrics |
+
+| **Value Proposition** | **Customer Segments** |
+|-----------------------|-----------------------|
+| • **Real‑time transaction monitoring** that flags anomalies within seconds, reducing settlement delays.  <br>• **Automated issue resolution** powered by LLM‑driven suggestions, cutting manual investigation time by >50 %.  <br>• **Compliance‑first design** (PCI‑DSS, GDPR, AML) that lowers regulatory risk.  <br>• **Plug‑and‑play integration** via REST, gRPC, and pre‑built connectors for major core banking systems.  <br>• **Actionable dashboards** that surface SLA breaches and client‑impact metrics, boosting satisfaction scores. | • **Retail & Commercial Banks** (mid‑size to large) seeking to modernize settlement pipelines.  <br>• **Fintech & neobanks** that process high‑volume digital payments and need rapid issue triage.  <br>• **Payment processors & acquirers** (e.g., Stripe, Adyen) looking for a white‑label monitoring layer.  <br>• **Credit unions & regional financial cooperatives** that lack in‑house monitoring expertise.  <br>• **Regulated B2B SaaS platforms** handling payroll or invoicing transactions. |
+
+| **Channels** | **Revenue Streams** |
+|--------------|---------------------|
+| • **Direct SaaS portal** (self‑service sign‑up, tiered plans).  <br>• **Enterprise sales** (dedicated account managers, custom SLAs).  <br>• **Partner marketplace** (integration listings on core‑banking platforms).  <br>• **API‑first offering** (pay‑per‑call for on‑demand anomaly checks).  <br>• **Professional services** (implementation, compliance consulting, custom model tuning). | • **Subscription fees** – tiered per‑month pricing (Starter, Professional, Enterprise).  <br>• **Usage‑based charges** – $0.001 per transaction processed beyond plan quota.  <br>• **Premium support** – 24/7 SLA tiers ($2k‑$10k / month).  <br>• **Implementation services** – fixed‑price projects ($25k‑$150k).  <br>• **Model licensing** – optional add‑on for proprietary fine‑tuned LLMs. |
+
+| **Key Resources** | **Cost Structure** |
+|-------------------|--------------------|
+| • **LLM inference stack** – vLLM for high‑throughput serving, SGLang for structured generation.  <br>• **Curated transaction datasets** (auto, messages, instr‑resp, query‑resp) stored in Axentx PGVector knowledge base.  <br>• **Engineering & QA teams** (product, devops, security).  <br>• **Compliance expertise** (legal counsel, AML/KYC specialists).  <br>• **Cloud infrastructure** (compute, storage, streaming).  <br>• **IP & brand** – finance‑guard
