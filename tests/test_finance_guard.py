@@ -1,42 +1,38 @@
+from finance_guard import FinanceGuard, Transaction
+import json
 import pytest
-from finance_guard import FinanceGuard, BackPressureHandler, Transaction
 
-@pytest.fixture
-def back_pressure_handler():
-    return BackPressureHandler(max_queue_size=10, max_processing_time=0.1)
+def test_process_transaction():
+    finance_guard = FinanceGuard()
+    transaction = Transaction(1, 100.0, '2022-01-01T12:00:00')
+    finance_guard.process_transaction(transaction)
+    assert len(finance_guard.log) == 1
+    assert finance_guard.log[0]['transaction']['id'] == 1
+    assert finance_guard.log[0]['transaction']['amount'] == 100.0
 
-@pytest.fixture
-def finance_guard(back_pressure_handler):
-    return FinanceGuard(back_pressure_handler)
+def test_replay():
+    finance_guard = FinanceGuard()
+    transaction1 = Transaction(1, 100.0, '2022-01-01T12:00:00')
+    transaction2 = Transaction(2, 200.0, '2022-01-01T12:00:00')
+    finance_guard.process_transaction(transaction1)
+    finance_guard.process_transaction(transaction2)
+    replay_log = finance_guard.replay(1)
+    assert len(replay_log) == 1
+    assert replay_log[0]['transaction']['id'] == 1
 
-def test_add_transaction(back_pressure_handler):
-    transaction = Transaction(id=1, amount=10.0)
-    assert back_pressure_handler.add_transaction(transaction) == True
-    assert len(back_pressure_handler.queue) == 1
+def test_export_log():
+    finance_guard = FinanceGuard()
+    transaction = Transaction(1, 100.0, '2022-01-01T12:00:00')
+    finance_guard.process_transaction(transaction)
+    export_log = finance_guard.export_log()
+    assert json.loads(export_log)[0]['transaction']['id'] == 1
 
-def test_add_transaction_max_queue_size(back_pressure_handler):
-    for i in range(10):
-        transaction = Transaction(id=i, amount=10.0)
-        back_pressure_handler.add_transaction(transaction)
-    transaction = Transaction(id=11, amount=10.0)
-    assert back_pressure_handler.add_transaction(transaction) == False
-    assert len(back_pressure_handler.queue) == 10
+def test_replay_empty_log():
+    finance_guard = FinanceGuard()
+    replay_log = finance_guard.replay(1)
+    assert replay_log == []
 
-def test_process_transactions(back_pressure_handler):
-    for i in range(5):
-        transaction = Transaction(id=i, amount=10.0)
-        back_pressure_handler.add_transaction(transaction)
-    processed_transactions = back_pressure_handler.process_transactions()
-    assert len(processed_transactions) == 5
-    assert len(back_pressure_handler.queue) == 0
-
-def test_handle_transaction(finance_guard):
-    transaction = Transaction(id=1, amount=10.0)
-    assert finance_guard.handle_transaction(transaction) == True
-
-def test_handle_transaction_max_queue_size(finance_guard):
-    for i in range(10):
-        transaction = Transaction(id=i, amount=10.0)
-        finance_guard.handle_transaction(transaction)
-    transaction = Transaction(id=11, amount=10.0)
-    assert finance_guard.handle_transaction(transaction) == False
+def test_export_empty_log():
+    finance_guard = FinanceGuard()
+    export_log = finance_guard.export_log()
+    assert json.loads(export_log) == []

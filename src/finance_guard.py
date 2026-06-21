@@ -1,44 +1,44 @@
 import json
+import hashlib
 from dataclasses import dataclass
+from datetime import datetime
 from typing import List
 
 @dataclass
 class Transaction:
     id: int
     amount: float
-
-class BackPressureHandler:
-    def __init__(self, max_queue_size: int, max_processing_time: float):
-        self.max_queue_size = max_queue_size
-        self.max_processing_time = max_processing_time
-        self.queue = []
-
-    def add_transaction(self, transaction: Transaction):
-        if len(self.queue) < self.max_queue_size:
-            self.queue.append(transaction)
-            return True
-        else:
-            return False
-
-    def process_transactions(self):
-        processed_transactions = []
-        for transaction in self.queue:
-            # Simulate processing time
-            import time
-            time.sleep(self.max_processing_time)
-            processed_transactions.append(transaction)
-        self.queue = []
-        return processed_transactions
+    timestamp: str
 
 class FinanceGuard:
-    def __init__(self, back_pressure_handler: BackPressureHandler):
-        self.back_pressure_handler = back_pressure_handler
+    def __init__(self):
+        self.log = []
 
-    def handle_transaction(self, transaction: Transaction):
-        if self.back_pressure_handler.add_transaction(transaction):
-            return True
-        else:
-            return False
+    def process_transaction(self, transaction: Transaction):
+        transaction_hash = self._calculate_hash(transaction)
+        self.log.append({
+            'transaction': transaction.__dict__,
+            'hash': transaction_hash,
+            'timestamp': datetime.now().isoformat()
+        })
 
-    def process_transactions(self):
-        return self.back_pressure_handler.process_transactions()
+    def _calculate_hash(self, transaction: Transaction):
+        transaction_str = json.dumps(transaction.__dict__, sort_keys=True)
+        return hashlib.sha256(transaction_str.encode()).hexdigest()
+
+    def replay(self, batch_id: int):
+        batch_log = [entry for entry in self.log if entry['transaction']['id'] == batch_id]
+        return batch_log
+
+    def export_log(self):
+        return json.dumps(self.log, indent=4)
+
+def main():
+    finance_guard = FinanceGuard()
+    transaction = Transaction(1, 100.0, '2022-01-01T12:00:00')
+    finance_guard.process_transaction(transaction)
+    print(finance_guard.replay(1))
+    print(finance_guard.export_log())
+
+if __name__ == '__main__':
+    main()
