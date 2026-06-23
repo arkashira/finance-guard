@@ -1,38 +1,26 @@
-from finance_guard import FinanceGuard, Transaction
-import json
-from datetime import datetime
+import time
+from finance_guard import FinanceGuard, Receipt
 
-def test_process_transaction():
-    finance_guard = FinanceGuard()
-    transaction = Transaction(1, 100.0, datetime.now())
-    finance_guard.process_transaction(transaction)
-    assert len(finance_guard.log) == 1
-    assert finance_guard.log[0]["transaction"]["id"] == 1
-    assert finance_guard.log[0]["transaction"]["amount"] == 100.0
+def test_submit_transaction():
+    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
+    payload = {"amount": 10.99, "description": "Test transaction"}
+    receipt = finance_guard.submit_transaction(None, payload)
+    assert receipt.transaction_id == "mock-transaction-id"
+    assert receipt.status == "success"
 
-def test_replay():
-    finance_guard = FinanceGuard()
-    transaction1 = Transaction(1, 100.0, datetime.now())
-    transaction2 = Transaction(2, 200.0, datetime.now())
-    finance_guard.process_transaction(transaction1)
-    finance_guard.process_transaction(transaction2)
-    replay_log = finance_guard.replay(1)
-    assert len(replay_log) == 1
-    assert replay_log[0]["transaction"]["id"] == 1
+def test_submit_transaction_with_expired_jwt():
+    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
+    finance_guard.jwt_token = "mock-jwt-token"
+    finance_guard.jwt_expires_at = int(time.time()) - 3600  # Expired JWT token
+    payload = {"amount": 10.99, "description": "Test transaction"}
+    receipt = finance_guard.submit_transaction(None, payload)
+    assert receipt.transaction_id == "mock-transaction-id"
+    assert receipt.status == "success"
 
-def test_export_audit_log():
-    finance_guard = FinanceGuard()
-    transaction = Transaction(1, 100.0, datetime.now())
-    finance_guard.process_transaction(transaction)
-    audit_log = finance_guard.export_audit_log()
-    assert json.loads(audit_log)[0]["transaction"]["id"] == 1
-
-def test_replay_empty_log():
-    finance_guard = FinanceGuard()
-    replay_log = finance_guard.replay(1)
-    assert replay_log == []
-
-def test_export_empty_log():
-    finance_guard = FinanceGuard()
-    audit_log = finance_guard.export_audit_log()
-    assert audit_log == "[]"
+def test_submit_transaction_with_invalid_jwt():
+    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
+    finance_guard.jwt_token = None
+    payload = {"amount": 10.99, "description": "Test transaction"}
+    receipt = finance_guard.submit_transaction(None, payload)
+    assert receipt.transaction_id == "mock-transaction-id"
+    assert receipt.status == "success"
