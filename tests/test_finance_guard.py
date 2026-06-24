@@ -1,26 +1,25 @@
-import time
-from finance_guard import FinanceGuard, Receipt
+import json
+from finance_guard import FinanceGuard, RegulatoryRequirement, ComplianceCheck
 
-def test_submit_transaction():
-    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
-    payload = {"amount": 10.99, "description": "Test transaction"}
-    receipt = finance_guard.submit_transaction(None, payload)
-    assert receipt.transaction_id == "mock-transaction-id"
-    assert receipt.status == "success"
+def test_meet_regulatory_requirements():
+    finance_guard = FinanceGuard()
+    requirements = [RegulatoryRequirement.PCI_DSS, RegulatoryRequirement.GDPR]
+    assert finance_guard.meet_regulatory_requirements(requirements)
 
-def test_submit_transaction_with_expired_jwt():
-    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
-    finance_guard.jwt_token = "mock-jwt-token"
-    finance_guard.jwt_expires_at = int(time.time()) - 3600  # Expired JWT token
-    payload = {"amount": 10.99, "description": "Test transaction"}
-    receipt = finance_guard.submit_transaction(None, payload)
-    assert receipt.transaction_id == "mock-transaction-id"
-    assert receipt.status == "success"
+def test_meet_regulatory_requirements_failure():
+    finance_guard = FinanceGuard()
+    requirements = [RegulatoryRequirement.PCI_DSS, RegulatoryRequirement.GDPR]
+    finance_guard.compliance_checks.append(ComplianceCheck(RegulatoryRequirement.PCI_DSS, False))
+    assert not finance_guard.meet_regulatory_requirements(requirements)
 
-def test_submit_transaction_with_invalid_jwt():
-    finance_guard = FinanceGuard("mock-client-id", "mock-client-secret")
-    finance_guard.jwt_token = None
-    payload = {"amount": 10.99, "description": "Test transaction"}
-    receipt = finance_guard.submit_transaction(None, payload)
-    assert receipt.transaction_id == "mock-transaction-id"
-    assert receipt.status == "success"
+def test_provide_cryptographic_integrity():
+    finance_guard = FinanceGuard()
+    data = "test_data"
+    result = finance_guard.provide_cryptographic_integrity(data)
+    assert json.loads(result) == {"data": data}
+
+def test_handle_audit():
+    finance_guard = FinanceGuard()
+    audit_data = "test_audit_data"
+    result = finance_guard.handle_audit(audit_data)
+    assert json.loads(result) == {"audit_data": audit_data}
